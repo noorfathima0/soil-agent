@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="../styles/admin/dashboard.css">
+</head>
+<body>
+  <header>
+    <h1>Admin Dashboard</h1>
+    <nav>
+      <button onclick="window.location.href='post-soil.html'">Post Soil</button>
+      <button onclick="window.location.href='post-distributor.html'">Post Distributor</button>
+    </nav>
+  </header>
+
+  <main>
+    <section>
+      <h2>Soil Details</h2>
+      <div id="soilDetailsContainer"></div>
+    </section>
+
+    <section>
+      <h2>Distributor Details</h2>
+      <div id="distributorDetailsContainer"></div>
+    </section>
+  </main>
+
+  <script type="module">
+    // Firebase Configuration
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js';
+    import { getFirestore, collection, getDocs, updateDoc, doc, deleteDoc } from 'https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDcFU7GqKQ6we-nyYFAVdEyZ_xaZj-bBuE",
+      authDomain: "soil-agent0.firebaseapp.com",
+      projectId: "soil-agent0",
+      storageBucket: "soil-agent0.firebasestorage.app",
+      messagingSenderId: "894416925683",
+      appId: "1:894416925683:web:f7bbb54e5c442d31bd5886"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Function to display soil details
+    async function loadSoilDetails() {
+      const querySnapshot = await getDocs(collection(db, 'soil'));
+      const soilDetailsContainer = document.getElementById('soilDetailsContainer');
+      soilDetailsContainer.innerHTML = ''; // Clear container before adding content
+
+      querySnapshot.forEach(doc => {
+        const soilData = doc.data();
+        const soilElement = document.createElement('div');
+        soilElement.innerHTML = `
+          <h3>${soilData.soilType}</h3>
+          <p><strong>Description:</strong> ${soilData.description}</p>
+          <button onclick="editSoil('${doc.id}')">Edit</button>
+          <button onclick="deleteSoil('${doc.id}')">Delete</button>
+        `;
+        soilDetailsContainer.appendChild(soilElement);
+      });
+    }
+
+    // Function to display distributor details
+    async function loadDistributorDetails() {
+      const querySnapshot = await getDocs(collection(db, 'distributors'));
+      const distributorDetailsContainer = document.getElementById('distributorDetailsContainer');
+      distributorDetailsContainer.innerHTML = ''; // Clear container before adding content
+
+      querySnapshot.forEach(doc => {
+        const distributorData = doc.data();
+        const distributorElement = document.createElement('div');
+        distributorElement.innerHTML = `
+          <h3>${distributorData.distributorName}</h3>
+          <p><strong>Location:</strong> ${distributorData.location}</p>
+          <p><strong>Contact Number:</strong> ${distributorData.contactNumber}</p>
+          <p><strong>Email:</strong> ${distributorData.email}</p>
+          <p><strong>Products Offered:</strong> ${distributorData.productsOffered}</p>
+          <button onclick="editDistributor('${doc.id}')">Edit</button>
+          <button onclick="deleteDistributor('${doc.id}')">Delete</button>
+        `;
+        distributorDetailsContainer.appendChild(distributorElement);
+      });
+    }
+
+    // Function to edit soil details
+    function editSoil(soilId) {
+      window.location.href = `edit-soil.html?id=${soilId}`;
+    }
+
+    // Function to edit distributor details
+    function editDistributor(distributorId) {
+      window.location.href = `edit-distributor.html?id=${distributorId}`;
+    }
+
+    // Function to delete soil details
+    async function deleteSoil(soilId) {
+      try {
+        await deleteDoc(doc(db, 'soil', soilId));
+        alert('Soil details deleted successfully.');
+        loadSoilDetails(); // Reload soil details
+      } catch (error) {
+        console.error('Error deleting soil details:', error);
+        alert('Error deleting soil details. Please try again.');
+      }
+    }
+
+    // Function to delete distributor details
+    async function deleteDistributor(distributorId) {
+      try {
+        await deleteDoc(doc(db, 'distributors', distributorId));
+        alert('Distributor details deleted successfully.');
+        loadDistributorDetails(); // Reload distributor details
+      } catch (error) {
+        console.error('Error deleting distributor details:', error);
+        alert('Error deleting distributor details. Please try again.');
+      }
+    }
+
+    // Load soil and distributor details on page load
+    window.onload = function() {
+      loadSoilDetails();
+      loadDistributorDetails();
+    };
+  </script>
+</body>
+</html>

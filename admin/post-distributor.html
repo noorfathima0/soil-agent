@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Post Distributor Details</title>
+  <link rel="stylesheet" href="../styles/admin/post-distribbutor.css">
+</head>
+<body>
+  <header>
+    <h1>Post Distributor Details</h1>
+    <nav>
+      <button onclick="window.location.href='dashboard.html'">Dashboard</button>
+      <button onclick="window.location.href='post-soil.html'">Post-soil</button>
+    </nav>
+  </header>
+  <main>
+    <form id="postDistributorForm">
+      <label for="distributorName">Distributor Name:</label>
+      <input type="text" id="distributorName" name="distributorName" required>
+
+      <label for="location">Location:</label>
+      <input type="text" id="location" name="location" required>
+
+      <label for="contactNumber">Contact Number:</label>
+      <input type="text" id="contactNumber" name="contactNumber" required>
+
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required>
+
+      <label for="productsOffered">Products Offered:</label>
+      <textarea id="productsOffered" name="productsOffered" required></textarea>
+
+      <button type="submit">Post Details</button>
+
+      <p id="successMessage" style="color: green; display: none;">Distributor details posted successfully!</p>
+      <p id="errorMessage" style="color: red; display: none;">An error occurred. Please try again.</p>
+    </form>
+  </main>
+
+  <script type="module">
+    // Firebase Configuration
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js';
+    import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDcFU7GqKQ6we-nyYFAVdEyZ_xaZj-bBuE",
+      authDomain: "soil-agent0.firebaseapp.com",
+      projectId: "soil-agent0",
+      storageBucket: "soil-agent0.firebasestorage.app",
+      messagingSenderId: "894416925683",
+      appId: "1:894416925683:web:f7bbb54e5c442d31bd5886"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    document.getElementById('postDistributorForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const distributorName = document.getElementById('distributorName').value;
+      const location = document.getElementById('location').value;
+      const contactNumber = document.getElementById('contactNumber').value;
+      const email = document.getElementById('email').value;
+      const productsOffered = document.getElementById('productsOffered').value;
+
+      try {
+        // Add distributor details to Firestore collection
+        await addDoc(collection(db, 'distributors'), {
+          distributorName: distributorName,
+          location: location,
+          contactNumber: contactNumber,
+          email: email,
+          productsOffered: productsOffered,
+          createdAt: serverTimestamp()
+        });
+
+        // Show success message
+        document.getElementById('successMessage').style.display = 'block';
+        document.getElementById('errorMessage').style.display = 'none';
+
+        // Clear the form
+        document.getElementById('postDistributorForm').reset();
+      } catch (error) {
+        console.error('Error posting distributor details:', error);
+        // Show error message
+        document.getElementById('successMessage').style.display = 'none';
+        document.getElementById('errorMessage').style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Post Soil Details</title>
+  <link rel="stylesheet" href="../styles/admin/post-soil.css">
+</head>
+<body>
+  <header>
+    <h1>Post Soil Details</h1>
+    <nav>
+      <button onclick="window.location.href='dashboard.html'">Dashboard</button>
+      <button onclick="window.location.href='post-distributor.html'">Post-Distributor</button>
+    </nav>
+  </header>
+  <main>
+    <form id="postSoilForm">
+      <label for="soilType">Soil Type:</label>
+      <input type="text" id="soilType" name="soilType" required>
+
+      <label for="description">Description:</label>
+      <textarea id="description" name="description" required></textarea>
+
+      <label for="rate">Rate (per unit):</label>
+      <input type="number" id="rate" name="rate" required>
+
+      <label for="crops">Crops That Will Grow:</label>
+      <input type="text" id="crops" name="crops" placeholder="e.g., Wheat, Rice" required>
+
+      <label for="phLevel">Soil pH Level:</label>
+      <input type="number" id="phLevel" name="phLevel" step="0.1" min="0" max="14" required>
+
+      <label for="moisture">Soil Moisture Content:</label>
+      <input type="number" id="moisture" name="moisture" step="0.1" min="0" max="100" required>
+
+      <label for="nutrients">Available Nutrients (e.g., Nitrogen, Phosphorus, Potassium):</label>
+      <input type="text" id="nutrients" name="nutrients" placeholder="e.g., NPK" required>
+
+      <button type="submit">Post Details</button>
+      <p id="successMessage" style="color: green; display: none;">Soil details posted successfully!</p>
+      <p id="errorMessage" style="color: red; display: none;">An error occurred. Please try again.</p>
+    </form>
+  </main>
+
+  <script type="module">
+    // Firebase Configuration
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js';
+    import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDcFU7GqKQ6we-nyYFAVdEyZ_xaZj-bBuE",
+      authDomain: "soil-agent0.firebaseapp.com",
+      projectId: "soil-agent0",
+      storageBucket: "soil-agent0.firebasestorage.app",
+      messagingSenderId: "894416925683",
+      appId: "1:894416925683:web:f7bbb54e5c442d31bd5886"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    document.getElementById('postSoilForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const soilType = document.getElementById('soilType').value;
+      const description = document.getElementById('description').value;
+      const rate = document.getElementById('rate').value;
+      const crops = document.getElementById('crops').value;
+      const phLevel = document.getElementById('phLevel').value;
+      const moisture = document.getElementById('moisture').value;
+      const nutrients = document.getElementById('nutrients').value;
+
+      try {
+        // Add soil details to Firestore collection
+        await addDoc(collection(db, 'soil'), {
+          soilType: soilType,
+          description: description,
+          rate: rate,
+          crops: crops,
+          phLevel: phLevel,
+          moisture: moisture,
+          nutrients: nutrients,
+          createdAt: serverTimestamp()
+        });
+
+        // Show success message
+        document.getElementById('successMessage').style.display = 'block';
+        document.getElementById('errorMessage').style.display = 'none';
+
+        // Clear the form
+        document.getElementById('postSoilForm').reset();
+      } catch (error) {
+        console.error('Error posting soil details:', error);
+        // Show error message
+        document.getElementById('successMessage').style.display = 'none';
+        document.getElementById('errorMessage').style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>

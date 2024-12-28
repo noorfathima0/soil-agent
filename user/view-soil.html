@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>View Soil Details</title>
+  <link rel="stylesheet" href="../styles/user/view-soil.css">
+</head>
+<body>
+  <header>
+    <h1>View Soil Details</h1>
+    <nav>
+      <button onclick="window.location.href='dashboard.html'">Dashboard</button>
+      <button onclick="window.location.href='view-distributor.html'">View Distributor</button>
+    </nav>
+  </header>
+  <main>
+    <div id="soilDetails" class="soil-grid">
+      <!-- Soil Details Cards will be dynamically added here -->
+    </div>
+  </main>
+
+  <script type="module">
+    // Firebase Configuration
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js';
+    import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDcFU7GqKQ6we-nyYFAVdEyZ_xaZj-bBuE",
+      authDomain: "soil-agent0.firebaseapp.com",
+      projectId: "soil-agent0",
+      storageBucket: "soil-agent0.firebasestorage.app",
+      messagingSenderId: "894416925683",
+      appId: "1:894416925683:web:f7bbb54e5c442d31bd5886"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function fetchSoilDetails() {
+      const soilCollection = collection(db, 'soil');
+      const soilSnapshot = await getDocs(soilCollection);
+      
+      // If soil details are available
+      if (!soilSnapshot.empty) {
+        const soilData = soilSnapshot.docs.map(doc => doc.data()); // Get all soil data
+
+        // Create a grid card for each soil type
+        soilData.forEach(soil => {
+          const soilCard = document.createElement('div');
+          soilCard.className = 'soil-card';
+
+          soilCard.innerHTML = `
+            <h3>${soil.soilType}</h3>
+            <p><strong>Description:</strong> ${soil.description}</p>
+            <p><strong>Rate (per unit):</strong> ₹${soil.rate}</p>
+            <p><strong>Crops That Will Grow:</strong> ${soil.crops}</p>
+            <p><strong>pH Level:</strong> ${soil.phLevel}</p>
+            <p><strong>Soil Moisture Content:</strong> ${soil.moisture}%</p>
+            <p><strong>Available Nutrients:</strong> ${soil.nutrients}</p>
+          `;
+
+          document.getElementById('soilDetails').appendChild(soilCard);
+        });
+      }
+    }
+
+    // Call the function to fetch soil details
+    fetchSoilDetails();
+  </script>
+</body>
+</html>

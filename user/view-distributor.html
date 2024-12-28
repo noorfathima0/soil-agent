@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>View Distributor Details</title>
+  <link rel="stylesheet" href="../styles/user/distributor.css">
+</head>
+<body>
+  <header>
+    <h1>View Distributor Details</h1>
+    <nav>
+      <button onclick="window.location.href='dashboard.html'">Dashboard</button>
+      <button onclick="window.location.href='view-soil.html'">View Soil</button>
+    </nav>
+  </header>
+  <main>
+    <div id="distributorDetails" class="distributor-grid">
+      <!-- Distributor Details Cards will be dynamically added here -->
+    </div>
+  </main>
+
+  <script type="module">
+    // Firebase Configuration
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js';
+    import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDcFU7GqKQ6we-nyYFAVdEyZ_xaZj-bBuE",
+      authDomain: "soil-agent0.firebaseapp.com",
+      projectId: "soil-agent0",
+      storageBucket: "soil-agent0.firebasestorage.app",
+      messagingSenderId: "894416925683",
+      appId: "1:894416925683:web:f7bbb54e5c442d31bd5886"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function fetchDistributorDetails() {
+      const distributorCollection = collection(db, 'distributors');
+      const distributorSnapshot = await getDocs(distributorCollection);
+      
+      // If distributor details are available
+      if (!distributorSnapshot.empty) {
+        const distributorData = distributorSnapshot.docs.map(doc => doc.data()); // Get all distributor data
+
+        // Create a grid card for each distributor
+        distributorData.forEach(distributor => {
+          const distributorCard = document.createElement('div');
+          distributorCard.className = 'distributor-card';
+
+          distributorCard.innerHTML = `
+            <h3>${distributor.distributorName}</h3>
+            <p><strong>Location:</strong> ${distributor.location}</p>
+            <p><strong>Contact Number:</strong> ${distributor.contactNumber}</p>
+            <p><strong>Email:</strong> ${distributor.email}</p>
+            <p><strong>Products Offered:</strong> ${distributor.productsOffered}</p>
+          `;
+
+          document.getElementById('distributorDetails').appendChild(distributorCard);
+        });
+      }
+    }
+
+    // Call the function to fetch distributor details
+    fetchDistributorDetails();
+  </script>
+</body>
+</html>
